@@ -6,6 +6,8 @@ module.exports.checkUserExists = (error) => {
       return new AppError("This username already exists", 400);
     if (error.stack.includes("email"))
       return new AppError("The email is already used", 400);
+    if (error.stack.includes("location"))
+      return new AppError("Place with same coordinates already exists", 400);
   }
 
   return error;

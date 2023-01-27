@@ -19,14 +19,14 @@ const DB = process.env.DATABASE.replace(
   process.env.DATABASE_PASSWORD
 );
 
+// DeprecationWarning
+mongoose.set("strictQuery", false);
+
 mongoose
   .connect(DB, {
     // just some options to deal with deprecation warnings.
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    // Enable to create index
-    // useCreateIndex: true,
-    // autoIndex: true,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
   })
   .then((conn) => {
     console.log("Database connection successful.");
@@ -44,7 +44,6 @@ const server = app.listen(port, () => {
 
 // Global handling of unhandled rejections
 process.on("unhandledRejection", (err) => {
-  // console.log("TEMP", err);
   console.log("❗❗❗ Unhandled Error:", err.message, `(${err.name})`);
   console.log("Shutting down server ...");
   // Proper way of closing server (after finishing all pending requests)

@@ -11,8 +11,9 @@ const settingsSchema = new mongoose.Schema(
     },
     mapType: {
       type: String,
-      enum: ["m", "y"],
-      default: "m",
+      enum: ["light", "dark"],
+      // enum: ["m", "y"],
+      default: "light",
     },
   },
   {
@@ -31,7 +32,7 @@ const userSchema = new mongoose.Schema(
         "Please, use only letters and numbers in username",
       ],
       minLength: [4, "Username must have at least 4 characters"],
-      maxLength: [15, "Username cannot have more than 15 characters"],
+      maxLength: [10, "Username cannot have more than 10 characters"],
     },
     email: {
       type: String,
@@ -39,10 +40,15 @@ const userSchema = new mongoose.Schema(
       unique: true,
       validate: [validator.isEmail, "Please, provide valid email"],
     },
+    photo: {
+      type: String,
+      required: [true, "User must have a photo"],
+    },
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
+      select: false,
     },
     password: {
       type: String,
@@ -66,7 +72,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: {
         language: "en",
-        mapType: "m",
+        mapType: "light",
       },
     },
     // passwordChangedAt: { type: Date, default: Date.now() },

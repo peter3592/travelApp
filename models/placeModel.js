@@ -1,21 +1,5 @@
 const mongoose = require("mongoose");
 
-const countrySchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Country name is mandatory"],
-    //  unique: true,
-  },
-  code: {
-    type: String,
-    required: [true, "Country code is mandatory"],
-  },
-  flag: {
-    type: String,
-    required: [true, "Country flag is mandatory"],
-  },
-});
-
 const placeSchema = new mongoose.Schema(
   {
     name: {
@@ -23,7 +7,10 @@ const placeSchema = new mongoose.Schema(
       required: [true, "Please, provide a name of place"],
       maxLength: [30, "Name of place cannot have more than 30 characters"],
     },
-    description: String,
+    description: {
+      type: String,
+      maxLength: [50, "Description cannot have more than 50 characters"],
+    },
     location: {
       // GeoJSON
       type: {
@@ -39,9 +26,29 @@ const placeSchema = new mongoose.Schema(
       required: [true, "Please, provide a photo name"],
     },
     photoUrl: { type: String, required: [true, "Please, provide a photo"] },
+    likes: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
+    comments: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Comment",
+      },
+    ],
     country: {
-      type: countrySchema,
-      required: true,
+      // type: countrySchema,
+      // required: true,
+      name: {
+        type: String,
+        required: [true, "Country name is mandatory"],
+        //  unique: true,
+      },
+      code: {
+        type: String,
+        required: [true, "Country code is mandatory"],
+      },
+      flagUrl: {
+        type: String,
+        required: [true, "Country flag is mandatory"],
+      },
     },
     user: {
       type: mongoose.Schema.ObjectId,
@@ -68,8 +75,21 @@ placeSchema.index({ location: "2dsphere" }); // Geospatial index
    ***** */
 placeSchema.pre("save", function (next) {
   // Round to 6 decimal place
-  this.latitude = Math.round(this.latitude * 1000000) / 1000000;
-  this.longitude = Math.round(this.longitude * 1000000) / 1000000;
+  this.location.coordinates[0] =
+    Math.round(this.location.coordinates[0] * 1000000) / 1000000;
+  this.location.coordinates[1] =
+    Math.round(this.location.coordinates[1] * 1000000) / 1000000;
+  // this.latitude = Math.round(this.latitude * 1000000) / 1000000;
+  // this.longitude = Math.round(this.longitude * 1000000) / 1000000;
+
+  next();
+});
+
+placeSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "user",
+    select: "_id username photo",
+  });
 
   next();
 });

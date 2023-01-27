@@ -12,6 +12,8 @@ const path = require("path");
 
 const userRouter = require("./routes/userRoutes");
 const placeRouter = require("./routes/placeRoutes");
+const commentRouter = require("./routes/commentRoutes");
+const wallPostRouter = require("./routes/wallPostRoutes");
 
 const globalErrorHandler = require("./controllers/errorController");
 
@@ -97,8 +99,8 @@ const limiter = rateLimit({
 app.use("/api", limiter); // affect only API
 
 // Body parsers, reading data from body into req.body
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true, limit: "10kb" })); // extended: true allows send more complex data, not neccessary in our case
+app.use(express.json({ limit: "50mb" })); // { limit: "10kb" }
+app.use(express.urlencoded({ extended: true, limit: "50mb" })); // extended: true allows send more complex data, not neccessary in our case
 app.use(express.text());
 
 // Data sanitization against NoSQL query injection
@@ -114,6 +116,10 @@ app.use(compression());
 app.use("/api/v1/users", userRouter);
 
 app.use("/api/v1/places", placeRouter);
+
+app.use("/api/v1/comments", commentRouter);
+
+app.use("/api/v1/wallposts", wallPostRouter);
 
 // Error Handling Middleware
 app.use(globalErrorHandler);

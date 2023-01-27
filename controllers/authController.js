@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const catchAsync = require("../utils/catchAsync");
 
 const User = require("./../models/userModel");
+const Place = require("./../models/placeModel");
 const AppError = require("./../utils/AppError");
 
 const createSendToken = (user, statusCode, req, res) => {
@@ -20,8 +21,6 @@ const createSendToken = (user, statusCode, req, res) => {
   if (req.secure) cookieOptions.secure = true;
 
   res.cookie("jwt", token, cookieOptions);
-  // res.cookie("jwt", token);
-  console.log("Sending cookie");
 
   // Remove password from output when creating user
   user.password = undefined;
@@ -36,10 +35,12 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 // Protecting the protected routes
-module.exports.protect = catchAsync(async (req, res, next) => {
-  console.log("COOKIES", req.cookies);
+module.exports.onlyLoggedUser = catchAsync(async (req, res, next) => {
   // 1) Getting token from cookies
   const token = req.cookies?.jwt;
+
+  // console.log("Only loggogning user");
+  // console.log("token:", token);
 
   if (!token)
     return next(
@@ -52,8 +53,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
   const currentUser = await User.findById(decoded.id);
 
   // 3) Check if user still exists
-  if (!currentUser)
-    return next(new AppError("The user does no longer exists", 401));
+  if (!currentUser) return next(new AppError("The user does not exist", 401));
 
   // 4) Check if user changed password after the token was issued
   if (currentUser.changedPasswordAfter(decoded.iat))
@@ -66,6 +66,26 @@ module.exports.protect = catchAsync(async (req, res, next) => {
 
   next();
 });
+
+module.exports.checkRestriction = async (req, res, next) => {
+  const { id: placeId, username } = req.params;
+
+  if (!placeId && !username) return next();
+
+  // Places
+  if (req.baseUrl.includes("places")) {
+    const place = await Place.findById(placeId);
+
+    if (place.user._id.toString() !== req.currentUser._id.toString())
+      return next(new AppError("You are not owner of this resource", 401));
+  }
+
+  // Users
+  if (req.baseUrl.includes("users") && username !== req.currentUser.username)
+    return next(new AppError("You are not owner of this resource", 401));
+
+  next();
+};
 
 module.exports.login = catchAsync(async (req, res, next) => {
   const { usernameEmail, password } = req.body;
@@ -88,8 +108,6 @@ module.exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError("Wrong username / email or password", 401));
   }
 
-  console.log("Login successful");
-
   // 3) If everything ok, send token to client
   createSendToken(user, 200, req, res);
 });
@@ -100,14 +118,33 @@ module.exports.logout = (req, res, next) => {
 };
 
 module.exports.signup = catchAsync(async (req, res, next) => {
-  const { username, email, password, passwordConfirm } = req.body;
+  const { username, email, password, passwordConfirm, photo } = req.body;
 
   const newUser = await User.create({
     username,
     email,
     password,
     passwordConfirm,
+    photo,
   });
 
   createSendToken(newUser, 201, req, res);
+});
+
+module.exports.refresh = catchAsync(async (req, res, next) => {
+  const token = req.cookies?.jwt;
+
+  console.log("Refreshing ...");
+
+  if (!token) return res.status(200).json({ status: "success", user: null });
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  const currentUser = await User.findById(decoded.id);
+
+  // 3) Check if user still exists
+  if (!currentUser)
+    return res.status(200).json({ status: "success", data: { user: null } });
+
+  res.status(200).json({ status: "success", data: { user: currentUser } });
 });
