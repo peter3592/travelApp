@@ -134,8 +134,6 @@ module.exports.signup = catchAsync(async (req, res, next) => {
 module.exports.refresh = catchAsync(async (req, res, next) => {
   const token = req.cookies?.jwt;
 
-  console.log("Refreshing ...");
-
   if (!token) return res.status(200).json({ status: "success", user: null });
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);

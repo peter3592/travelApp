@@ -38,15 +38,20 @@ exports.getAllUsers = catchAsync(async function (req, res, next) {
 });
 
 exports.updateUser = catchAsync(async function (req, res, next) {
-  const { language, mapType } = req.body;
+  const { mapLanguage, mapType } = req.body;
 
-  if (!language && !mapType) {
+  if (!mapLanguage && !mapType) {
     return next(new AppError("Update User Error", 400));
   }
 
+  let updateObject;
+
+  if (mapType) updateObject = { "settings.mapType": mapType };
+  if (mapLanguage) updateObject = { "settings.language": mapLanguage };
+
   const updatedUser = await User.findOneAndUpdate(
     { username: req.params.username },
-    { "settings.language": language, "settings.mapType": mapType },
+    updateObject,
     {
       new: true,
       runValidators: true,
@@ -74,13 +79,15 @@ exports.deleteUser = catchAsync(async function (req, res, next) {
     username: req.params.username,
   }).select("+password");
 
-  if (!user) {
-    return next(new AppError("Deleting user error", 400));
+  if (!user) return next(new AppError("Deleting user error", 400));
+
+  if (!req.currentUser._id.equals(user._id)) {
+    console.log("Ownership:", req.currentUser._id.equals(user._id));
+    return next(new AppError("User can delete only his own account", 401));
   }
 
-  if (!(await user.correctPassword(req.body.password))) {
+  if (!(await user.correctPassword(req.body.password)))
     return next(new AppError("Wrong password", 401));
-  }
 
   const deletedUser = await User.findOneAndDelete({
     username: req.params.username,
@@ -146,11 +153,14 @@ exports.searchByName = catchAsync(async (req, res, next) => {
 exports.generatePhoto = catchAsync(async (req, res, next) => {
   const response = await fetch(process.env.RANDOM_IMAGE_URL);
 
-  if (!response.ok)
-    res.status(200).json({
+  if (!response.ok) {
+    console.log("Unable to get random photo");
+
+    return res.status(200).json({
       status: "error",
       message: "Unable to get random photo",
     });
+  }
 
   const { url } = await response.json();
 

@@ -11,6 +11,7 @@ const {
   createWallPost,
   deleteWallPost,
 } = require("./../utils/handleWallPosts");
+const WallPost = require("../models/wallPostModel");
 
 // Configuration of image cloud service
 cloudinary.v2.config({
@@ -119,6 +120,9 @@ exports.uploadPhoto = catchAsync(async (req, res, next) => {
 
   const userId = req.currentUser._id;
   const timestamp = Date.now();
+
+  console.log("Body:", req.body);
+  console.log("File:", req.file);
 
   // We need filename property in next middleware
   req.file.filename = `user-${userId}-${timestamp}`;
@@ -308,6 +312,9 @@ exports.deletePlace = catchAsync(async (req, res, next) => {
   // Delete place image from image cloud
   deleteImage(deletedPlace.photoTitle);
 
+  // Delete wall posts
+  await WallPost.deleteMany({ place: deletedPlace._id });
+
   res.status(204).json({
     status: "success",
   });
@@ -465,7 +472,7 @@ exports.searchByName = catchAsync(async (req, res, next) => {
 
   const places = await Place.find({
     name: { $regex: regex },
-  });
+  }).populate("comments");
 
   res.status(200).json({
     status: "success",
@@ -478,24 +485,31 @@ exports.searchByName = catchAsync(async (req, res, next) => {
 exports.getTopPlaces = catchAsync(async function (req, res, next) {
   const { username } = req.body;
 
-  const topPlaces = await Place.find().sort({ likes: -1 });
-  // .limit(3)
-  // .select("comments.author");
-
-  console.log("topky", topPlaces.length);
-
-  console.log("usernamko", username);
+  const topPlaces = await Place.find().populate("comments").sort({ likes: -1 });
 
   const topThreePlaces = topPlaces
     .filter((place) => (username ? place.user.username === username : true))
     .slice(0, 3);
 
-  console.log("top 3:", topThreePlaces.length);
-
   res.status(200).json({
     status: "success",
     data: {
       topPlaces: topThreePlaces,
+    },
+  });
+});
+
+exports.getRecentPlaces = catchAsync(async function (req, res, next) {
+  const recentPlaces = await Place.find()
+    .populate("comments")
+    .sort({ createdAt: -1 })
+    .limit(3);
+  // .populate("comments");
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      recentPlaces,
     },
   });
 });
