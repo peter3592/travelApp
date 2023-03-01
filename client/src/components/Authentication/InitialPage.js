@@ -18,10 +18,10 @@ const loadImage = (src) => {
 };
 
 const imagesUrl = [
-  "img/travelGifxxx2.gif",
-  "img/travelGif00.gif",
-  "img/travelGifP.gif",
-  "img/travelGif0.gif",
+  "img/travelGif1.gif",
+  "img/travelGif2.gif",
+  "img/travelGif3.gif",
+  "img/travelGif4.gif",
 ];
 
 const texts = [
