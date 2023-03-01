@@ -10,11 +10,11 @@ router
   .route("/")
   .get(authController.onlyLoggedUser, userController.getAllUsers);
 
-router.post("/login", authController.login);
 router.get("/logout", authController.onlyLoggedUser, authController.logout);
-router.post("/signup", authController.signup);
 router.get("/refresh", authController.refresh);
 router.get("/generate-photo", userController.generatePhoto);
+router.post("/login", authController.login);
+router.post("/signup", authController.signup);
 
 router
   .route("/search-by-name")

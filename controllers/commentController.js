@@ -68,8 +68,6 @@ exports.deleteComment = catchAsync(async function (req, res, next) {
     // author: req.currentUser,
   });
 
-  console.log("Deleted comment", deletedComment);
-
   if (!deletedComment) return next(new AppError("Deleting comment error", 500));
 
   const otherComments = await Comment.find({
@@ -81,9 +79,8 @@ exports.deleteComment = catchAsync(async function (req, res, next) {
   if (otherComments.length === 0)
     deleteWallPost({
       type: "comment",
-      place: deletedComment.place._id,
-      sourceUser: req.currentUser._id,
-      // targetUser: updatedPlace.user._id,
+      place: deletedComment.place,
+      sourceUser: deletedComment.author,
       next,
     });
 

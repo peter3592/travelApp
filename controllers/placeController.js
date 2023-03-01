@@ -12,6 +12,7 @@ const {
   deleteWallPost,
 } = require("./../utils/handleWallPosts");
 const WallPost = require("../models/wallPostModel");
+const Comment = require("../models/commentModel");
 
 // Configuration of image cloud service
 cloudinary.v2.config({
@@ -36,12 +37,19 @@ exports.processFormData = upload.single("photo"); // this middleware creates req
 // "photo" is field name of sended Form Data formular
 
 exports.checkValues = async (req, res, next) => {
-  const { latitude, longitude } = req.body;
+  const { name, latitude, longitude } = req.body;
 
-  if (!latitude && latitude !== 0)
-    return next(new AppError("Please, provide a latitude", 400));
-  if (!longitude && longitude !== 0)
-    return next(new AppError("Please, provide a longitude", 400));
+  console.log("bodko", req.body);
+
+  if (!name) return next(new AppError("Missing place name", 400));
+
+  if (!latitude || !longitude)
+    return next(new AppError("Missing coordinates", 400));
+
+  // if (!latitude && latitude !== 0)
+  //   return next(new AppError("Please, provide a latitude", 400));
+  // if (!longitude && longitude !== 0)
+  //   return next(new AppError("Please, provide a longitude", 400));
 
   // Check if there is no place with same latitude and longitude
   const place = await Place.findOne({
@@ -67,11 +75,11 @@ exports.checkValues = async (req, res, next) => {
   next();
 };
 
-const deleteImage = (photoTitle) => {
+const deleteImage = (photoCloudName) => {
   // after uploading photo, something went wrong
   // in saving new place in db, so delete photo
   cloudinary.v2.uploader.destroy(
-    `travelmap/${photoTitle}`,
+    `travelmap/${photoCloudName}`,
     { type: "authenticated" },
     function (error, result) {
       if (error || result.result !== "ok") {
@@ -121,16 +129,18 @@ exports.uploadPhoto = catchAsync(async (req, res, next) => {
   const userId = req.currentUser._id;
   const timestamp = Date.now();
 
-  console.log("Body:", req.body);
-  console.log("File:", req.file);
+  if (!req.file) return next(new AppError("Please, provide an image", 400));
 
   // We need filename property in next middleware
   req.file.filename = `user-${userId}-${timestamp}`;
 
-  const compressedBuffer = await compressImage(req.file.buffer, 1024);
+  // const compressedBuffer = await compressImage(req.file.buffer, 1024);
+  const compressedBuffer = req.file.buffer;
 
   const stream = await sharp(compressedBuffer) // we stored image in memory
     .toFormat("jpeg") // convert all images to jpeg
+    .rotate()
+    // .withMetadata({ orientation: 6 })
     .toBuffer();
 
   cloudinary.v2.uploader
@@ -194,7 +204,7 @@ exports.getPlace = catchAsync(async function (req, res, next) {
 });
 
 exports.getAllPlaces = catchAsync(async function (req, res, next) {
-  const places = await Place.find();
+  const places = await Place.find().populate("comments");
   // .select("comments.author");
 
   res.status(200).json({
@@ -234,15 +244,9 @@ exports.createPlace = catchAsync(async function (req, res, next) {
   }
 
   const { name, latitude, longitude, photoUrl, description } = req.body;
-  const photoTitle = req.file.filename;
+  const photoCloudName = req.file.filename;
 
   // const countryCode = await getCountryCode(latitude, longitude);
-
-  // if (!countryCode)
-  //   return res.status(400).json({
-  //     status: "fail",
-  //     message: "Unable to find country with this coordinates",
-  //   });
 
   const countryFlag = process.env.FLAG_URL.replace(
     "countryCode",
@@ -264,7 +268,7 @@ exports.createPlace = catchAsync(async function (req, res, next) {
       "country.name": countryName,
       "country.flagUrl": countryFlag,
       "country.code": req.countryCode,
-      photoTitle,
+      photoCloudName,
       photoUrl,
       description,
       user: req.currentUser._id,
@@ -276,8 +280,10 @@ exports.createPlace = catchAsync(async function (req, res, next) {
       sourceUser: req.currentUser._id,
     });
 
-    if (!creatingOk)
+    if (!creatingOk) {
+      deleteImage(photoCloudName);
       return next(new AppError("Creating like wall post error", 404));
+    }
 
     res.status(201).json({
       status: "success",
@@ -287,21 +293,20 @@ exports.createPlace = catchAsync(async function (req, res, next) {
     });
   } catch (err) {
     console.log("Deleting image ...");
-    deleteImage(photoTitle);
+    deleteImage(photoCloudName);
+    // console.log(err.message);
+    // return next(new AppError("XXXX", 400));
     throw err;
   }
 });
 
 exports.deletePlace = catchAsync(async (req, res, next) => {
-  console.log("req.body", req.body);
-
-  const idToDelete = req.body.id;
+  const idToDelete = req.params.id;
 
   if (!idToDelete)
     return next(new AppError("No id provided for deleting place", 500));
 
   const deletedPlace = await Place.findOneAndDelete({
-    user: req.currentUser,
     _id: idToDelete,
   });
 
@@ -310,12 +315,15 @@ exports.deletePlace = catchAsync(async (req, res, next) => {
   }
 
   // Delete place image from image cloud
-  deleteImage(deletedPlace.photoTitle);
+  deleteImage(deletedPlace.photoCloudName);
 
   // Delete wall posts
   await WallPost.deleteMany({ place: deletedPlace._id });
 
-  res.status(204).json({
+  // Delete Comments
+  await Comment.deleteMany({ place: deletedPlace._id });
+
+  await res.status(204).json({
     status: "success",
   });
 });
@@ -338,7 +346,6 @@ exports.likePlace = catchAsync(async (req, res, next) => {
     };
 
     // Remove wall post about like
-    // if (!req.currentUser._id.equals(place.user._id)) {
     const deletingOk = await deleteWallPost({
       type: "like",
       sourceUser: req.currentUser._id,
@@ -429,10 +436,6 @@ const getCountryData = async (latitude, longitude, next) => {
     return next(
       new AppError("Unable to find country with this coordinates", 400)
     );
-  // return res.status(400).json({
-  //   status: "fail",
-  //   message: "Unable to find country with this coordinates",
-  // });
 
   const countryName =
     countryCode === "us"
@@ -485,10 +488,22 @@ exports.searchByName = catchAsync(async (req, res, next) => {
 exports.getTopPlaces = catchAsync(async function (req, res, next) {
   const { username } = req.body;
 
-  const topPlaces = await Place.find().populate("comments").sort({ likes: -1 });
+  let topPlaces = await Place.aggregate([
+    { $addFields: { num_likes: { $size: { $ifNull: ["$likes", []] } } } },
+    { $sort: { num_likes: -1 } },
+  ]);
+  // let topPlaces = await Place.aggregate([
+  //   { $addFields: { num_likes: { $size: "$likes" } } },
+  //   { $sort: { num_likes: -1 } },
+  // ]);
+
+  topPlaces = await Place.populate(topPlaces, { path: "comments" });
+
+  topPlaces = await Place.populate(topPlaces, { path: "user" });
 
   const topThreePlaces = topPlaces
     .filter((place) => (username ? place.user.username === username : true))
+    .filter((place) => place.num_likes > 0)
     .slice(0, 3);
 
   res.status(200).json({

@@ -12,6 +12,10 @@ router
 
 router
   .route("/:id")
-  .delete(authController.onlyLoggedUser, commentController.deleteComment);
+  .delete(
+    authController.onlyLoggedUser,
+    authController.checkRestriction,
+    commentController.deleteComment
+  );
 
 module.exports = router;

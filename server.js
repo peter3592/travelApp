@@ -4,6 +4,10 @@
 //   * https://openweathermap.org/api
 //   * https://leafletjs.com/
 
+const express = require("express");
+const path = require("path");
+////////
+
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
@@ -36,6 +40,20 @@ mongoose
   });
 
 mongoose.syncIndexes();
+
+// Serving the frontend
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "./client/build")));
+
+  app.get("*", function (_, res) {
+    res.sendFile(
+      path.join(__dirname, "./client/build/index.html"),
+      function (err) {
+        res.status(500).send(err);
+      }
+    );
+  });
+}
 
 // Server Start
 const server = app.listen(port, () => {

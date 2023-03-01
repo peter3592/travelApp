@@ -51,10 +51,41 @@ const exceptionUrls = [
   "https://api.openweathermap.org/",
   "http://openweathermap.org/",
   "https://res.cloudinary.com/",
+  "https://ozgrozer.github.io/",
+  // "https://res.cloudinary.com/",
+  // "https://ozgrozer.github.io/",
+  // "http://localhost:3000/api/*",
+  // "http://localhost:3001/api/*",
 ];
 
 // Set security HTTP headers
 app.use(helmet());
+
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: {
+//       directives: {
+//         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+//         "img-src": ["'self'", "www.res.cloudinary.com"],
+//       },
+//     },
+//   })
+// );
+
+// app.use(helmet({ crossOriginEmbedderPolicy: false, originAgentCluster: true }));
+
+// app.use(
+//   helmet({
+//     crossOriginEmbedderPolicy: false,
+//     contentSecurityPolicy: {
+//       useDefaults: true,
+//       directives: {
+//         "img-src": ["'self'", "https: data:"],
+//       },
+//     },
+//   })
+// );
+
 csp.extend(app, {
   policy: {
     directives: {
@@ -90,7 +121,7 @@ csp.extend(app, {
 
 // Limit request from same IP
 const limiter = rateLimit({
-  max: 100, // maximum number of request
+  max: 500, // maximum number of request
   windowMs: 1 * 60 * 1000, // ... in 1 minutes
   message: "Too many requests from this IP, please try again later!",
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers

@@ -15,7 +15,11 @@ cloudinary.v2.config({
 });
 
 exports.getUser = catchAsync(async function (req, res, next) {
-  const user = await User.findOne({ username: req.params.username });
+  const username = req.params.username;
+
+  if (username === "admin") return next(new AppError("User not found", 404));
+
+  const user = await User.findOne({ username });
 
   if (!user) return next(new AppError("User not found", 404));
 
@@ -26,7 +30,7 @@ exports.getUser = catchAsync(async function (req, res, next) {
 });
 
 exports.getAllUsers = catchAsync(async function (req, res, next) {
-  const users = await User.find();
+  const users = await User.find({ role: { $ne: "admin" } });
 
   res.status(200).json({
     status: "success",
@@ -71,7 +75,7 @@ exports.updateUser = catchAsync(async function (req, res, next) {
 exports.deleteUser = catchAsync(async function (req, res, next) {
   //const deletedUser = await User.deleteOne({ id: req.user._id });
   // const deletedUser = await User.findOneAndDelete({ _id: req.user._id });
-  if (!req.body.password) {
+  if (req.currentUser.role !== "admin" && !req.body.password) {
     return next(new AppError("Please, provide a password", 400));
   }
 
@@ -81,13 +85,11 @@ exports.deleteUser = catchAsync(async function (req, res, next) {
 
   if (!user) return next(new AppError("Deleting user error", 400));
 
-  if (!req.currentUser._id.equals(user._id)) {
-    console.log("Ownership:", req.currentUser._id.equals(user._id));
-    return next(new AppError("User can delete only his own account", 401));
-  }
-
-  if (!(await user.correctPassword(req.body.password)))
-    return next(new AppError("Wrong password", 401));
+  if (
+    req.currentUser.role !== "admin" &&
+    !(await user.correctPassword(req.body.password))
+  )
+    return next(new AppError("Wrong password", 403));
 
   const deletedUser = await User.findOneAndDelete({
     username: req.params.username,
@@ -103,7 +105,7 @@ exports.deleteUser = catchAsync(async function (req, res, next) {
   placesToDelete.forEach(async (place) => {
     // Delete image on cloudinary
     cloudinary.v2.uploader.destroy(
-      `travelmap/${place.photoTitle}`,
+      `travelmap/${place.photoCloudName}`,
       { type: "authenticated" },
       function (error, result) {
         if (error || result.result !== "ok") {
@@ -140,6 +142,7 @@ exports.searchByName = catchAsync(async (req, res, next) => {
 
   const users = await User.find({
     username: { $regex: regex },
+    role: { $ne: "admin" },
   });
 
   res.status(200).json({

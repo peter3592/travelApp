@@ -21,25 +21,45 @@ const settingsSchema = new mongoose.Schema(
   }
 );
 
+const usernameValidators = [
+  {
+    validator: validator.isAlphanumeric,
+    msg: "Please, use only letters and numbers in username",
+  },
+  {
+    validator:
+      // this only works with methods .save() or .create()
+      (name) => {
+        return (
+          name !== "admin" &&
+          name !== "users" &&
+          name !== "settings" &&
+          name !== "login" &&
+          name !== "signup" &&
+          name !== "logout" &&
+          name !== "refresh"
+        );
+      },
+    msg: "Forbidden username",
+  },
+];
+
 const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
       required: [true, "Please, provide an username"],
       unique: true,
-      validate: [
-        validator.isAlphanumeric,
-        "Please, use only letters and numbers in username",
-      ],
+      validate: usernameValidators,
       minLength: [4, "Username must have at least 4 characters"],
       maxLength: [10, "Username cannot have more than 10 characters"],
     },
-    email: {
-      type: String,
-      required: [true, "Please, provide an email"],
-      unique: true,
-      validate: [validator.isEmail, "Please, provide valid email"],
-    },
+    // email: {
+    //   type: String,
+    //   required: [true, "Please, provide an email"],
+    //   unique: true,
+    //   validate: [validator.isEmail, "Please, provide valid email"],
+    // },
     photo: {
       type: String,
       required: [true, "User must have a photo"],
@@ -53,7 +73,14 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Please, provide a password"],
-      minLength: [4, "Password must have at least 4 characters."],
+      minLength: [6, "Password must have at least 6 characters"],
+      validate: {
+        // this only works with methods .save() or .create()
+        validator: function (el) {
+          return !el.includes(" ");
+        },
+        message: "Password cannot include space",
+      },
       select: false, // never show when quering users
     },
     passwordConfirm: {
@@ -64,7 +91,7 @@ const userSchema = new mongoose.Schema(
         validator: function (el) {
           return el === this.password;
         },
-        message: "Passwords are not the same!",
+        message: "Passwords are not the same",
       },
     },
     settings: {

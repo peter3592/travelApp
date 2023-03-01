@@ -5,11 +5,11 @@ const placeSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "Please, provide a name of place"],
-      maxLength: [30, "Name of place cannot have more than 30 characters"],
+      maxLength: [25, "Name of place cannot have more than 30 characters"],
     },
     description: {
       type: String,
-      maxLength: [50, "Description cannot have more than 50 characters"],
+      maxLength: [70, "Description cannot have more than 50 characters"],
     },
     location: {
       // GeoJSON
@@ -21,7 +21,7 @@ const placeSchema = new mongoose.Schema(
       },
       coordinates: [Number],
     },
-    photoTitle: {
+    photoCloudName: {
       type: String,
       required: [true, "Please, provide a photo name"],
     },

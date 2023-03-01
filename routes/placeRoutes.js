@@ -8,7 +8,6 @@ const router = express.Router({ mergeParams: true });
 router
   .route("/")
   .get(authController.onlyLoggedUser, placeController.getAllPlaces)
-  .delete(authController.onlyLoggedUser, placeController.deletePlace)
   .post(
     authController.onlyLoggedUser,
     placeController.processFormData,
@@ -44,6 +43,11 @@ router
     authController.onlyLoggedUser,
     authController.checkRestriction,
     placeController.updatePlace
+  )
+  .delete(
+    authController.onlyLoggedUser,
+    authController.checkRestriction,
+    placeController.deletePlace
   );
 
 module.exports = router;

@@ -30,12 +30,12 @@ const wallPostSchema = new mongoose.Schema(
 wallPostSchema.pre(/^find/, function (next) {
   this.populate({
     path: "sourceUser",
-    select: "_id username",
+    select: "_id username photo",
   });
 
   this.populate({
     path: "targetUser",
-    select: "_id username",
+    select: "_id username photo",
   });
 
   this.populate({
