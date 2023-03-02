@@ -179,6 +179,7 @@ export default function WallPost({
         {/* <span>&nbsp;</span> */}
         <img
           src={place.country.flagUrl.replace("w80", "32x24")}
+          crossorigin="anonymous"
           className="wallPost__flag"
         />
       </WallPostNewPlace>
