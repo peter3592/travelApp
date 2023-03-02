@@ -43,6 +43,8 @@ mongoose.syncIndexes();
 
 // Serving the frontend
 if (process.env.NODE_ENV === "production") {
+  delete process.env.REACT_APP_URL;
+
   app.use(express.static(path.join(__dirname, "./client/build")));
 
   app.get("*", function (_, res) {
