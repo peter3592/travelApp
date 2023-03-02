@@ -104,7 +104,7 @@ const Div = styled.div`
     overflow-y: auto;
     /* width: 100%; */
     min-width: 50rem;
-    max-width: 70rem;
+    max-width: 80rem;
   }
 
   .newPlaces__container {
