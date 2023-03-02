@@ -1,33 +1,24 @@
 import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../UI/Button";
 import Heart from "../../UI/Heart";
-import { useEffect, useState } from "react";
-import fetchAPI from "../../../utils/fetchAPI";
 
 export default function UserListItem({ user }) {
-  // const [places, setPlaces] = useState(null);
-  // const [loading, setLoading] = useState(true);
-
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   if (user.count) setLoading(false);
-  // }, [user.count]);
-
-  const imageLoadHandler = () => {
-    // setLoading(false);
-  };
+  // const imageLoadHandler = () => {
+  //   // setLoading(false);
+  // };
 
   return (
-    <Div>
+    <Li>
       <div className="left">
         <div className="topLevel"></div>
         <div className="photoContainer">
           <img
             src={user.photo}
             alt={`${user.username}'s photo`}
-            onLoad={imageLoadHandler}
+            // onLoad={imageLoadHandler}
             crossorigin="anonymous"
             onError={({ currentTarget }) => {
               currentTarget.onerror = null; // prevents looping
@@ -65,7 +56,7 @@ export default function UserListItem({ user }) {
           SEE MAP
         </Button>
       </div>
-    </Div>
+    </Li>
   );
 }
 
@@ -73,7 +64,7 @@ export default function UserListItem({ user }) {
   /* <Link to={`/${user.username}`}>{user.username}</Link> */
 }
 
-const Div = styled.li`
+const Li = styled.li`
   /* font-size: 3rem; */
   display: flex;
   /* width: 25rem; */

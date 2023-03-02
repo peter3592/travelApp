@@ -197,6 +197,8 @@ export default function WallPost({
 const Div = styled.div`
   width: 100%;
 
+  overflow: hidden;
+
   :not(:last-of-type) {
     margin-bottom: 1.2rem;
   }

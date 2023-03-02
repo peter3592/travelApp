@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import PlaceComment from "./PlaceComment";
 import PlaceCommentsList from "./PlaceCommentsList";
 import { FaRegTimesCircle } from "react-icons/fa";
 import { RiSendPlane2Fill } from "react-icons/ri";
@@ -233,12 +232,13 @@ const Div = styled.div`
       width: calc(100% + 2 * 3.1rem);
       transform: translateX(-3.2rem);
       letter-spacing: 2px;
-      font-family: "Fredoka One", bold;
+      /* font-family: "Fredoka One", bold; */
       background-color: ${({ titleColor }) =>
         titleColor ? titleColor.hex : ""};
       text-align: center;
       /* font-size: 2.2rem; */
       font-size: 2rem;
+      font-weight: bold;
       padding: 1.7rem 1rem;
       color: ${({ titleColor }) =>
         titleColor?.isDark ? "white;" : "var(--color-primary)"};

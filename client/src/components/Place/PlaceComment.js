@@ -16,10 +16,7 @@ export default function PlaceComment({ author, text, commentId }) {
   const navigate = useNavigate();
 
   const deleteCommentHandler = async () => {
-    const { ok, message } = await fetchAPI(
-      `api/v1/comments/${commentId}`,
-      "DELETE"
-    );
+    const { ok } = await fetchAPI(`api/v1/comments/${commentId}`, "DELETE");
 
     if (!ok)
       return setModal({ type: "error", message: "Deleting comment error" });

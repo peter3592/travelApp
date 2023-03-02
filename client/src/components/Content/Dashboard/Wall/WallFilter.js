@@ -1,4 +1,4 @@
-import { DivIcon } from "leaflet";
+// import { DivIcon } from "leaflet";
 import { useEffect, useReducer } from "react";
 import styled from "styled-components";
 import { BsFillCheckCircleFill } from "react-icons/bs";

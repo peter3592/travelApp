@@ -18,7 +18,7 @@ const loadImage = (src) => {
 };
 
 const imagesUrl = [
-  "img/travelGif2.gif",
+  "img/travelGif1.gif",
   "img/travelGif2.gif",
   "img/travelGif3.gif",
   "img/travelGif4.gif",
@@ -76,9 +76,10 @@ export default function InitialPage() {
         <Div breakpoints={breakpoints}>
           <div className="wrapper">
             <div className="auth">
-              <p className="title">
+              <div className="title">
                 travel<span>app</span>
-              </p>
+                <div className="beta">BETA</div>
+              </div>
               <div className="auth__container">
                 {authState === "login" && <Login setAuthState={setAuthState} />}
                 {authState === "signup" && (
@@ -140,6 +141,14 @@ const Div = styled.div`
     font-family: "Fredoka One", cursive;
     text-align: center;
     color: var(--color-primary);
+    position: relative;
+
+    .beta {
+      font-size: 2.2rem;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
 
     span {
       color: var(--color-secondary);

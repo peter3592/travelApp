@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
-import Header from "../Content/Header/Header";
 import { useDataContext, useUIContext } from "../../store/context";
 import Place from "../Place/Place";
 

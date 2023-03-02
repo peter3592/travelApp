@@ -58,8 +58,8 @@ export default function TopPlaceItem({ place }) {
   }, [
     imageRef.current?.width,
     imageRef.current?.height,
-    imageContainerWidth,
-    imageContainerHeight,
+    // imageContainerWidth,
+    // imageContainerHeight,
   ]);
 
   return (

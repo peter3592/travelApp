@@ -70,7 +70,6 @@ function App() {
           <Route
             path="/login"
             element={currentUser ? <Navigate to="/" /> : <InitialPage />}
-            // element={currentUser ? <Navigate to="/" /> : <Login />}
           />
           <Route
             path="/signup"

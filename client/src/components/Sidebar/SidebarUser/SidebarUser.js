@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import TopPlaces from "../TopPlaces/TopPlaces";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { IoMdPin } from "react-icons/io";
 import fetchAPI from "../../../utils/fetchAPI";

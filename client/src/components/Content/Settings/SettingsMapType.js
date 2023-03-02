@@ -14,7 +14,7 @@ export default function SettingContainerType() {
 
     const newMapType = mapType === "light" ? "dark" : "light";
 
-    const { ok, message } = await fetchAPI(
+    const { ok } = await fetchAPI(
       `api/v1/users/${currentUser.username}`,
       "PATCH",
       { mapType: newMapType }

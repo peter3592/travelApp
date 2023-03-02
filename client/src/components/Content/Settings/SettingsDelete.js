@@ -17,7 +17,7 @@ export default function SettingsDelete() {
     if (passwordInputRef.current.value.length === 0)
       return setModal({ type: "error", message: "Please, provide a password" });
 
-    const { ok, data, message } = await fetchAPI(
+    const { ok, message } = await fetchAPI(
       `api/v1/users/${currentUser.username}`,
       "DELETE",
       {

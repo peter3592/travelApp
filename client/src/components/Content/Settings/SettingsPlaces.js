@@ -1,26 +1,25 @@
-import { useLayoutEffect, useState } from "react";
-import { useEffect } from "react";
+import { useState } from "react";
+// import { useEffect } from "react";
 import styled from "styled-components";
 import { useDataContext, useUIContext } from "../../../store/context";
 import { BsTrash } from "react-icons/bs";
 import fetchAPI from "../../../utils/fetchAPI";
 
 export default function SettingsPlaces({ places, setPlaces }) {
-  // const { currentUser } = useAuthContext();
   const { setPlace, reloadData } = useDataContext();
   const { setModal } = useUIContext();
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      places.forEach((place) => {
-        place.weather = "35 ~C";
-      });
+  // useEffect(() => {
+  //   (async () => {
+  //     places.forEach((place) => {
+  //       place.weather = "35 °C";
+  //     });
 
-      setLoading(false);
-    })();
-  }, []);
+  //     setLoading(false);
+  //   })();
+  // }, []);
 
   const trashClickHandler = async (id) => {
     if (deleting) return;
@@ -42,8 +41,8 @@ export default function SettingsPlaces({ places, setPlaces }) {
 
   return (
     <>
-      {!loading && places.length === 0 && <Title>You have no places</Title>}
-      {!loading && places.length > 0 && (
+      {places?.length === 0 && <Title>You have no places</Title>}
+      {places?.length > 0 && (
         <Table>
           <p className="row row--first row--first--flag"></p>
           <p className="row row--first">Name</p>

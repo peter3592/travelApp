@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import Button from "../../UI/Button";
 import SettingsMapLanguage from "./SettingsMapLanguage";
 import SettingsMapType from "./SettingsMapType";
 import SettingContainer from "./SettingContainer";
@@ -9,7 +8,6 @@ import { useEffect } from "react";
 import { useAuthContext } from "../../../store/context";
 import fetchAPI from "../../../utils/fetchAPI";
 import LoadingSpinner from "../../UI/LoadingSpinner";
-import { useLayoutEffect } from "react";
 import SettingsDelete from "./SettingsDelete";
 
 export default function Settings() {

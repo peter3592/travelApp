@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { useDataContext } from "../../../store/context";
-import { BsFillPinMapFill } from "react-icons/bs";
+// import { BsFillPinMapFill } from "react-icons/bs";
 import { FiUser } from "react-icons/fi";
+import { MdOutlinePlace } from "react-icons/md";
 
 import spanAllSubstrings from "../../../utils/spanAllSubstrings";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +29,7 @@ export default function SearchBarResult({ type, searchString, place, user }) {
   }
 
   if (type === "place") {
-    icon = <BsFillPinMapFill className="icon" />;
+    icon = <MdOutlinePlace className="icon" />;
     photo = place.photoUrl;
     name =
       searchString.length > 0

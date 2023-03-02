@@ -21,7 +21,7 @@ export default function Signup({ setAuthState }) {
       await generateImage();
       setInitialLoadFinished(true);
     })();
-  }, []);
+  }, [generateImage]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -113,9 +113,12 @@ export default function Signup({ setAuthState }) {
           {loadingPhoto ? (
             <LoadingSpinner2 />
           ) : (
-            <div className="imgContainer__image" onClick={generateImage}></div>
+            <img
+              src={userPhoto}
+              className="imgContainer__image"
+              onClick={generateImage}
+            />
           )}
-          {/* <LoadingSpinner2 /> */}
         </div>
 
         <Button type="secondary" medium>
@@ -161,13 +164,9 @@ const Form = styled.form`
     cursor: pointer;
     box-shadow: 0px 0px 6px 4px var(--color-primary);
 
-    &__image {
+    img {
       width: 100%;
       height: 100%;
-
-      background: ${({ photoUrl }) => `url(${photoUrl})`};
-      background-repeat: no-repeat;
-      background-size: cover;
     }
   }
 `;

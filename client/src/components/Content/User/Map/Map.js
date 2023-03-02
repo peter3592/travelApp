@@ -1,14 +1,12 @@
 import Leaflet from "leaflet/dist/leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useAuthContext,
-  // useUIContext,
   useDataContext,
   useUIContext,
 } from "../../../../store/context";
-// import Place from "../../../api/models/placeModel";
 
 import styled from "styled-components";
 import NewPlaceForm from "./NewPlaceForm";
@@ -26,26 +24,11 @@ const bounds = Leaflet.latLngBounds(southWest, northEast);
 let map;
 
 const mapInit = () => {
-  // if (mapType === "light") mapTypeLeaflet = "m";
-  // if (mapType === "dark") mapTypeLeaflet = "y";
-
   map = Leaflet.map("map", {
     zoomControl: false,
     maxBounds: bounds,
     maxBoundsViscosity: 1,
   }).setView(defaultCoords, defaultZoomLevel);
-
-  // Leaflet.tileLayer(
-  //   `http://{s}.google.com/vt/lyrs=${mapTypeLeaflet}&x={x}&y={y}&z={z}&hl=${mapLanguage}`,
-  //   {
-  //     maxZoom: 18,
-  //     minZoom: 2.5,
-  //     // subdomains: ["mts0", "mts1", "mts2", "mts3"],
-  //     // subdomains: ["mts0", "mts2"],
-  //     subdomains: ["mt1", "mt2", "mt3"],
-  //     noWrap: true, // stop creating multiple maps
-  //   }
-  // ).addTo(map);
 };
 
 export default function Map() {
@@ -55,10 +38,8 @@ export default function Map() {
 
   const { setModal } = useUIContext();
 
-  // const [markers, setMarkers] = useState([]);
   const [newPlaceMod, setNewPlaceMod] = useState(false);
   const [showNewGameForm, setShowNewGameForm] = useState(false);
-  // const [mapClicked, setMapClicked] = useState(false);
 
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
@@ -67,7 +48,6 @@ export default function Map() {
 
   const [places, setPlaces] = useState(null);
   const [user, setUser] = useState(null);
-  // const [loading, setLoading] = useState(true);
 
   const params = useParams();
   const navigate = useNavigate();
@@ -108,58 +88,15 @@ export default function Map() {
     })();
 
     fillMap(map);
-
-    // setLoading(false);
   }, [params]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     console.log("useEffect runned");
-  //     console.log("newPlaceMod", newPlaceMod);
-  //     console.log("mapClicked", mapClicked);
-
-  //     if (newPlaceMod && mapClicked) {
-  //       setMapClicked(false);
-
-  //       const { ok, data } = await fetchAPI(
-  //         "api/v1/places/get-country",
-  //         "POST",
-  //         { latitude, longitude }
-  //       );
-
-  //       if (!ok)
-  //         return setModal({
-  //           type: "info",
-  //           message: "Could not recognize country",
-  //         });
-
-  //       setModal(null);
-
-  //       setCountryName(data.countryName);
-  //       setFlagUrl(data.flagUrl);
-  //       setShowNewGameForm(true);
-  //     }
-  //   })();
-  // }, [mapClicked]);
 
   useEffect(() => {
     fillMap(map);
   }, [places]);
 
   const mapClickHandler = async (e) => {
-    // const username = params.username;
-
     setLatitude(+e.latlng.lat);
     setLongitude(+e.latlng.lng);
-
-    console.log(+e.latlng.lat, +e.latlng.lng, newPlaceMod);
-
-    // setMapClicked(true);
-
-    ////////////////////////
-
-    // if (newPlaceMod) {
-    // setMapClicked(false);
 
     const { ok, data } = await fetchAPI("api/v1/places/get-country", "POST", {
       latitude: +e.latlng.lat,
@@ -209,7 +146,6 @@ export default function Map() {
         message: "Choose location by clicking on map",
       });
 
-    // console.log("Button Click:", "newPlaceMod", newPlaceMod);
     setShowNewGameForm(false);
     setNewPlaceMod((prev) => !prev);
   };
