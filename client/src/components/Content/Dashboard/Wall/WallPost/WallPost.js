@@ -147,9 +147,6 @@ export default function WallPost({
             </div>
           </div>
         </Link>
-        {/* <span>&nbsp;added new place&nbsp;</span> */}
-        {/* {` added new place ${&#160;}`} */}
-        {/* <>&nbsp;added new place&nbsp;</> */}
         <span>added&nbsp;</span>
         <span>new&nbsp;</span>
         <span>place&nbsp;</span>
@@ -162,26 +159,18 @@ export default function WallPost({
             {word}&nbsp;
           </span>
         ))}
-        {/* <span
-          className="strong"
-          data-placeid={place._id}
-          onClick={placeClickHandler}
-        >
-          {place.name}
-        </span> */}
-        {/* <span>&nbsp;</span> */}
         <span>located&nbsp;</span>
         <span>in&nbsp;</span>
         <span>place&nbsp;</span>
         <span>{place.country.name}</span>
-        {/* <span>{`located in ${place.country.name}`}</span> */}
         <span>&nbsp;&nbsp;</span>
-        {/* <span>&nbsp;</span> */}
+        {/* <span className="wallPost__flag"> */}
         <img
           src={place.country.flagUrl.replace("w80", "32x24")}
           crossorigin="anonymous"
-          className="wallPost__flag"
+          // className="wallPost__flag"
         />
+        {/* </span> */}
       </WallPostNewPlace>
     );
   }

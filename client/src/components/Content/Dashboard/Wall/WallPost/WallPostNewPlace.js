@@ -108,7 +108,6 @@ const Div = styled.div`
   .wallLink {
     display: flex;
     align-items: center;
-    /* gap: 0.3rem; */
   }
 
   .postContent {
@@ -116,4 +115,14 @@ const Div = styled.div`
     justify-content: center;
     align-items: center;
   }
+
+  /* .wallPost__flag {
+    width: 32px;
+    height: 24px;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+  } */
 `;
