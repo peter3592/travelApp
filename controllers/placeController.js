@@ -486,7 +486,7 @@ exports.searchByName = catchAsync(async (req, res, next) => {
 });
 
 exports.getTopPlaces = catchAsync(async function (req, res, next) {
-  const { username } = req.body;
+  // const { username } = req.body;
 
   let topPlaces = await Place.aggregate([
     { $addFields: { num_likes: { $size: { $ifNull: ["$likes", []] } } } },
@@ -502,7 +502,7 @@ exports.getTopPlaces = catchAsync(async function (req, res, next) {
   topPlaces = await Place.populate(topPlaces, { path: "user" });
 
   const topThreePlaces = topPlaces
-    .filter((place) => (username ? place.user.username === username : true))
+    // .filter((place) => (username ? place.user.username === username : true))
     .filter((place) => place.num_likes > 0)
     .slice(0, 3);
 
@@ -525,6 +525,46 @@ exports.getRecentPlaces = catchAsync(async function (req, res, next) {
     status: "success",
     data: {
       recentPlaces,
+    },
+  });
+});
+
+exports.reloadData = catchAsync(async function (req, res, next) {
+  // GET TOP PLACES
+  let topPlaces = await Place.aggregate([
+    { $addFields: { num_likes: { $size: { $ifNull: ["$likes", []] } } } },
+    { $sort: { num_likes: -1 } },
+  ]);
+  // let topPlaces = await Place.aggregate([
+  //   { $addFields: { num_likes: { $size: "$likes" } } },
+  //   { $sort: { num_likes: -1 } },
+  // ]);
+
+  topPlaces = await Place.populate(topPlaces, { path: "comments" });
+
+  topPlaces = await Place.populate(topPlaces, { path: "user" });
+
+  const topThreePlaces = topPlaces
+    // .filter((place) => (username ? place.user.username === username : true))
+    .filter((place) => place.num_likes > 0)
+    .slice(0, 3);
+
+  // GET RECENT PLACES
+  const recentPlaces = await Place.find()
+    .populate("comments")
+    .sort({ createdAt: -1 })
+    .limit(3);
+  // .populate("comments");
+
+  // GET WALLPOSTS
+  const wallPosts = await WallPost.find();
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      topPlaces: topThreePlaces,
+      recentPlaces,
+      wallPosts,
     },
   });
 });

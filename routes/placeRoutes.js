@@ -26,11 +26,15 @@ router
 
 router
   .route("/top-places")
-  .post(authController.onlyLoggedUser, placeController.getTopPlaces);
+  .get(authController.onlyLoggedUser, placeController.getTopPlaces);
 
 router
   .route("/recent-places")
   .get(authController.onlyLoggedUser, placeController.getRecentPlaces);
+
+router
+  .route("/reload-data")
+  .get(authController.onlyLoggedUser, placeController.reloadData);
 
 router
   .route("/:id/like")
