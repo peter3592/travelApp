@@ -18,7 +18,7 @@ const loadImage = (src) => {
 };
 
 const imagesUrl = [
-  "img/travelGif1.gif",
+  "img/travelGif2.gif",
   "img/travelGif2.gif",
   "img/travelGif3.gif",
   "img/travelGif4.gif",
