@@ -31,7 +31,11 @@ const fetchAPI = async (endpoint, method, body) => {
           };
   }
 
-  const res = await fetch(`${process.env.REACT_APP_URL}/${endpoint}`, config);
+  let url = process.env.REACT_APP_URL ? process.env.REACT_APP_URL : "";
+
+  console.log("url", url);
+
+  const res = await fetch(`${url}/${endpoint}`, config);
 
   // Token expired
   if (res.status === 401 && window.location.pathname !== "/login")
