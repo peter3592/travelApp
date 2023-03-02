@@ -18,14 +18,14 @@ const loadImage = (src) => {
 };
 
 const imagesUrl = [
-  "img/travelGif2.gif",
+  // "img/travelGif1.gif",
   "img/travelGif2.gif",
   "img/travelGif3.gif",
   "img/travelGif4.gif",
 ];
 
 const texts = [
-  "Use flags to quickly move around the map",
+  // "Use flags to quickly move around the map",
   "Check the activity of other travelers",
   "Like or comment any photo",
   "Change the appearance of the map",
@@ -76,10 +76,9 @@ export default function InitialPage() {
         <Div breakpoints={breakpoints}>
           <div className="wrapper">
             <div className="auth">
-              <div className="title">
+              <p className="title">
                 travel<span>app</span>
-                <div className="beta">BETA</div>
-              </div>
+              </p>
               <div className="auth__container">
                 {authState === "login" && <Login setAuthState={setAuthState} />}
                 {authState === "signup" && (
@@ -142,13 +141,6 @@ const Div = styled.div`
     text-align: center;
     color: var(--color-primary);
     position: relative;
-
-    .beta {
-      font-size: 2.2rem;
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
 
     span {
       color: var(--color-secondary);
