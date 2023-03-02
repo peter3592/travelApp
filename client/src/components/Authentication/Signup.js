@@ -117,6 +117,7 @@ export default function Signup({ setAuthState }) {
               src={userPhoto}
               className="imgContainer__image"
               onClick={generateImage}
+              crossorigin="anonymous"
             />
           )}
         </div>

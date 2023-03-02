@@ -31,9 +31,8 @@ const fetchAPI = async (endpoint, method, body) => {
           };
   }
 
+  // When client is runned with npm start, .env.development is used
   let url = process.env.REACT_APP_URL ? process.env.REACT_APP_URL : "";
-
-  console.log("url", url);
 
   const res = await fetch(`${url}/${endpoint}`, config);
 
