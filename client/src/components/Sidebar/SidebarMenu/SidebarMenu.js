@@ -34,7 +34,7 @@ const Div = styled.div`
 
   width: 100%;
 
-  padding: 0 3rem;
+  padding: 0 2rem;
 
   /* width: 100%;
   height: 100%; */

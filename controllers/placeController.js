@@ -84,19 +84,19 @@ const deleteImage = (photoCloudName) => {
         if (error) console.log(error);
         if (result.result !== "ok") console.log(result);
       }
-    }
-  );
 
-  cloudinary.v2.uploader.destroy(
-    `travelmap/${photoCloudName}-small`,
-    { type: "authenticated" },
-    function (error, result) {
-      if (error || result.result !== "ok") {
-        // Just print to console error with deleting image from cloud
-        console.log("💥💥Deleting image from cloud error");
-        if (error) console.log(error);
-        if (result.result !== "ok") console.log(result);
-      }
+      cloudinary.v2.uploader.destroy(
+        `travelmap/${photoCloudName}-small`,
+        { type: "authenticated" },
+        function (error, result) {
+          if (error || result.result !== "ok") {
+            // Just print to console error with deleting image from cloud
+            console.log("💥💥Deleting image from cloud error");
+            if (error) console.log(error);
+            if (result.result !== "ok") console.log(result);
+          }
+        }
+      );
     }
   );
 };
@@ -179,9 +179,6 @@ exports.uploadPhoto = catchAsync(async (req, res, next) => {
 
   const metadata = await sharpBuffer.metadata();
 
-  // const maxWidth = 2000;
-  // const maxHeight = 2000;
-
   if (metadata.width > MAX_DIMENSION || metadata.height > MAX_DIMENSION) {
     const ratio = metadata.width / metadata.height;
 
@@ -194,9 +191,10 @@ exports.uploadPhoto = catchAsync(async (req, res, next) => {
 
   const sharpBufferSmall = sharpBuffer;
 
+  // Upload Normal Size Photo
   const stream = await sharpBuffer // we stored image in memory
     .toFormat("jpeg") // convert all images to jpeg
-    .rotate()
+    .rotate() // to mantain orientation
     .toBuffer();
 
   cloudinary.v2.uploader
@@ -215,9 +213,7 @@ exports.uploadPhoto = catchAsync(async (req, res, next) => {
 
         req.body.photoUrl = result.secure_url;
 
-        ////////////////////////////////////////////////
-        // const maxWidthSmall = 100;
-        // const maxHeightSmall = 100;
+        // Upload Small Size Photo
 
         if (
           metadata.width > MAX_DIMENSION_SMALL ||
