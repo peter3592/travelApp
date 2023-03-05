@@ -84,7 +84,7 @@ const Container = styled.div`
     color: ${({ highlighted }) =>
       highlighted ? "white;" : "var(--color-heart);"};
     font-size: ${({ size }) => (size === "big" ? "1.9rem;" : "1.2rem;")};
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     cursor: ${({ size }) => (size === "big" ? "pointer;" : "normal;")};
   }
 
