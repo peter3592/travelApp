@@ -46,7 +46,7 @@ app.options("*", cors());
 
 const exceptionUrls = [
   "https://unpkg.com/",
-  "http://*.google.com",
+  "https://*.google.com",
   "https://flagcdn.com/",
   "https://api.openweathermap.org/",
   "http://openweathermap.org/",

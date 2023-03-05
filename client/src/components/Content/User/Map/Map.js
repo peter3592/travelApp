@@ -206,7 +206,7 @@ export default function Map() {
     if (mapType === "dark") mapTypeLeaflet = "y";
 
     Leaflet.tileLayer(
-      `http://{s}.google.com/vt/lyrs=${mapTypeLeaflet}&x={x}&y={y}&z={z}&hl=${mapLanguage}`,
+      `https://{s}.google.com/vt/lyrs=${mapTypeLeaflet}&x={x}&y={y}&z={z}&hl=${mapLanguage}`,
       {
         maxZoom: 18,
         minZoom: 2.5,
