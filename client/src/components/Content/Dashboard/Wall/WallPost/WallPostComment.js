@@ -37,8 +37,14 @@ const Div = styled.div`
   }
 
   .postContent {
-    display: flex;
+    /* display: flex;
     justify-content: center;
+    align-items: center; */
+
+    display: flex;
+    justify-content: flex-start;
     align-items: center;
+
+    flex-wrap: wrap;
   }
 `;

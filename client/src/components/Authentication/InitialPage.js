@@ -19,15 +19,15 @@ const loadImage = (src) => {
 
 const imagesUrl = [
   // "img/travelGif1.gif",
-  "img/travelGif2.gif",
   "img/travelGif3.gif",
+  "img/travelGif2.gif",
   "img/travelGif4.gif",
 ];
 
 const texts = [
   // "Use flags to quickly move around the map",
-  "Check the activity of other travelers",
   "Like or comment any photo",
+  "Check the activity of other travelers",
   "Change the appearance of the map",
 ];
 

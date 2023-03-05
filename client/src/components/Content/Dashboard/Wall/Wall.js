@@ -6,6 +6,7 @@ import { useState } from "react";
 import WallPost from "./WallPost/WallPost";
 import WallNewPlaces from "./WallNewPlaces/WallNewPlaces";
 import LoadingSpinner from "../../../UI/LoadingSpinner";
+import LoadingSpinner2 from "../../../UI/LoadingSpinner2";
 import AutoRefresh from "./AutoRefresh";
 import { useEffect } from "react";
 import Button from "../../../UI/Button";
@@ -18,7 +19,7 @@ export default function Wall() {
     comment: true,
     newPlace: true,
   });
-  const [paginatedPosts, setPaginatedPosts] = useState([]);
+  const [paginatedPosts, setPaginatedPosts] = useState();
   const [page, setPage] = useState(1);
 
   const { wallPosts } = useDataContext();
@@ -32,12 +33,17 @@ export default function Wall() {
   return (
     <Div>
       <div className="posts__container">
-        {paginatedPosts && paginatedPosts.length === 0 ? (
+        {/* <LoadingSpinner2 /> */}
+        {!paginatedPosts && <LoadingSpinner2 />}
+        {paginatedPosts && paginatedPosts.length === 0 && (
           <p className="noPostTitle">No wall posts</p>
-        ) : (
+        )}
+        {paginatedPosts && paginatedPosts.length > 0 && (
           <>
             <WallFilter setFilteredItems={setFilteredItems} />
-            <AutoRefresh />
+            {(filteredItems.like ||
+              filteredItems.comment ||
+              filteredItems.newPlace) && <AutoRefresh />}
             <div className="posts">
               {paginatedPosts
                 .filter((post) => filteredItems[post.type])
@@ -52,11 +58,15 @@ export default function Wall() {
                     hide={!filteredItems[post.type]}
                   />
                 ))}
-              <div className="btnContainer">
-                <Button small onClick={() => setPage((prev) => prev + 1)}>
-                  Load More
-                </Button>
-              </div>
+              {(filteredItems.like ||
+                filteredItems.comment ||
+                filteredItems.newPlace) && (
+                <div className="btnContainer">
+                  <Button small onClick={() => setPage((prev) => prev + 1)}>
+                    Load More
+                  </Button>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -70,7 +80,7 @@ export default function Wall() {
 
 const Div = styled.div`
   display: flex;
-  gap: 5rem;
+  gap: 2rem;
 
   padding: 2rem;
 
@@ -81,14 +91,15 @@ const Div = styled.div`
 
   .posts__container {
     height: 100%;
-    /* flex-grow: 1; */
-    width: 100%;
+    flex-grow: 1;
+    position: relative;
+
+    overflow-x: none;
 
     display: flex;
     flex-direction: column;
 
     border-bottom-left-radius: var(--border-radius);
-    overflow: hidden;
 
     .noPostTitle {
       color: var(--color-primary);
@@ -99,21 +110,18 @@ const Div = styled.div`
   }
 
   .posts {
-    margin: 0 auto;
     overflow-x: none;
     overflow-y: auto;
-    /* width: 100%; */
-    min-width: 50rem;
-    max-width: 70rem;
+    align-self: center;
 
-    /* width: 75rem; */
+    max-width: 70rem;
+    margin-bottom: 2rem;
   }
 
   .newPlaces__container {
     border-bottom-right-radius: var(--border-radius);
     overflow: hidden;
-    /* width: 18rem; */
-    flex-basis: 18rem;
+    width: 18rem;
     flex-shrink: 0;
   }
 

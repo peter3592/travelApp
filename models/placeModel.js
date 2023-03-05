@@ -26,6 +26,7 @@ const placeSchema = new mongoose.Schema(
       required: [true, "Please, provide a photo name"],
     },
     photoUrl: { type: String, required: [true, "Please, provide a photo"] },
+    smallPhotoUrl: String,
     likes: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
     comments: [
       {

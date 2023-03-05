@@ -53,7 +53,7 @@ export default function WallNewPlace({ place, index }) {
         </Link>
         <div className="place">
           <img
-            src={place.photoUrl}
+            src={place.smallPhotoUrl}
             className="place__photo"
             crossorigin="anonymous"
             onClick={placeClickHandler}

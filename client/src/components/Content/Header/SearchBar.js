@@ -80,7 +80,7 @@ export default function SearchBar() {
       />
       {showSearchResults && (
         <>
-          <div className="results__topPart"></div>
+          <div className="results__topPart" />
           <>
             <div className="results">
               {noResults && <SearchBarResult type="noResults" />}
@@ -141,16 +141,13 @@ const Div = styled.div`
     left: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    /* border-bottom-left-radius: 1.45rem;
-    border-bottom-right-radius: 1.45rem; */
-    /* overflow: hidden; */
 
     &__topPart {
       width: 100%;
       height: 2rem;
       background-color: #ddd;
       position: absolute;
-      top: 1.5rem;
+      top: 1.6rem;
       left: 0;
 
       z-index: -1;

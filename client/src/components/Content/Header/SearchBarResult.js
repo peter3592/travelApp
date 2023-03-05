@@ -30,7 +30,7 @@ export default function SearchBarResult({ type, searchString, place, user }) {
 
   if (type === "place") {
     icon = <MdOutlinePlace className="icon" />;
-    photo = place.photoUrl;
+    photo = place.smallPhotoUrl;
     name =
       searchString.length > 0
         ? spanAllSubstrings(place.name, searchString)
@@ -71,6 +71,8 @@ const Div = styled.div`
 
   transition: 0.2s all;
 
+  /* transform: translateY(-3px); */
+
   :hover {
     background-color: #eee;
   }
@@ -99,6 +101,7 @@ const Div = styled.div`
     img {
       width: 100%;
       height: 100%;
+      image-resolution: 20dpi;
     }
   }
 

@@ -37,6 +37,10 @@ router
   .get(authController.onlyLoggedUser, placeController.reloadData);
 
 router
+  .route("/compress")
+  .get(authController.onlyLoggedUser, placeController.compress);
+
+router
   .route("/:id/like")
   .patch(authController.onlyLoggedUser, placeController.likePlace);
 

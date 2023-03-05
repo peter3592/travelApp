@@ -39,8 +39,6 @@ exports.processFormData = upload.single("photo"); // this middleware creates req
 exports.checkValues = async (req, res, next) => {
   const { name, latitude, longitude } = req.body;
 
-  console.log("bodko", req.body);
-
   if (!name) return next(new AppError("Missing place name", 400));
 
   if (!latitude || !longitude)
@@ -76,10 +74,21 @@ exports.checkValues = async (req, res, next) => {
 };
 
 const deleteImage = (photoCloudName) => {
-  // after uploading photo, something went wrong
-  // in saving new place in db, so delete photo
   cloudinary.v2.uploader.destroy(
     `travelmap/${photoCloudName}`,
+    { type: "authenticated" },
+    function (error, result) {
+      if (error || result.result !== "ok") {
+        // Just print to console error with deleting image from cloud
+        console.log("💥💥Deleting image from cloud error");
+        if (error) console.log(error);
+        if (result.result !== "ok") console.log(result);
+      }
+    }
+  );
+
+  cloudinary.v2.uploader.destroy(
+    `travelmap/${photoCloudName}-small`,
     { type: "authenticated" },
     function (error, result) {
       if (error || result.result !== "ok") {
@@ -93,6 +102,33 @@ const deleteImage = (photoCloudName) => {
 };
 
 const compressImage = async (originalBuffer, maxKbSize) => {
+  //https://github.com/lovell/sharp/issues/1667s
+  let compressedBuffer = originalBuffer;
+  let quality = 80;
+
+  while (compressedBuffer.byteLength > maxKbSize * 1024 && quality > 0) {
+    compressedBuffer = await sharp(originalBuffer)
+      .toFormat("jpeg")
+      .jpeg({ quality })
+      .toBuffer();
+
+    //quality -= 7;
+    quality -= 10;
+
+    console.log(
+      "Quality:",
+      quality,
+      "%, Size:",
+      compressedBuffer.byteLength,
+      "kb"
+    );
+  }
+
+  return compressedBuffer;
+};
+
+const makeSmallImage = async (originalBuffer, maxKbSize) => {
+  //https://github.com/lovell/sharp/issues/1667s
   let compressedBuffer = originalBuffer;
   let quality = 80;
 
@@ -125,6 +161,8 @@ exports.uploadPhoto = catchAsync(async (req, res, next) => {
   //   // return next(new AppError("Please, provide an image", 400));
   //   return next();
   // }
+  const MAX_DIMENSION = 2000;
+  const MAX_DIMENSION_SMALL = 100;
 
   const userId = req.currentUser._id;
   const timestamp = Date.now();
@@ -134,13 +172,31 @@ exports.uploadPhoto = catchAsync(async (req, res, next) => {
   // We need filename property in next middleware
   req.file.filename = `user-${userId}-${timestamp}`;
 
-  // const compressedBuffer = await compressImage(req.file.buffer, 1024);
-  const compressedBuffer = req.file.buffer;
+  const compressedBuffer = await compressImage(req.file.buffer, 1024);
+  // const compressedBuffer = req.file.buffer;
 
-  const stream = await sharp(compressedBuffer) // we stored image in memory
+  const sharpBuffer = sharp(compressedBuffer);
+
+  const metadata = await sharpBuffer.metadata();
+
+  // const maxWidth = 2000;
+  // const maxHeight = 2000;
+
+  if (metadata.width > MAX_DIMENSION || metadata.height > MAX_DIMENSION) {
+    const ratio = metadata.width / metadata.height;
+
+    if (metadata.width > metadata.height) {
+      sharpBuffer.resize(MAX_DIMENSION, Math.trunc(MAX_DIMENSION / ratio));
+    } else {
+      sharpBuffer.resize(Math.trunc(MAX_DIMENSION * ratio), MAX_DIMENSION);
+    }
+  }
+
+  const sharpBufferSmall = sharpBuffer;
+
+  const stream = await sharpBuffer // we stored image in memory
     .toFormat("jpeg") // convert all images to jpeg
     .rotate()
-    // .withMetadata({ orientation: 6 })
     .toBuffer();
 
   cloudinary.v2.uploader
@@ -152,13 +208,62 @@ exports.uploadPhoto = catchAsync(async (req, res, next) => {
         sign_url: true,
         type: "authenticated",
       },
-      function (error, result) {
+      async function (error, result) {
         if (error) {
           return next(new AppError("Upload image error", 500));
         }
 
         req.body.photoUrl = result.secure_url;
-        next();
+
+        ////////////////////////////////////////////////
+        // const maxWidthSmall = 100;
+        // const maxHeightSmall = 100;
+
+        if (
+          metadata.width > MAX_DIMENSION_SMALL ||
+          metadata.height > MAX_DIMENSION_SMALL
+        ) {
+          const ratio = metadata.width / metadata.height;
+
+          if (metadata.width > metadata.height) {
+            sharpBufferSmall.resize(
+              MAX_DIMENSION_SMALL,
+              Math.trunc(MAX_DIMENSION_SMALL / ratio)
+            );
+          } else {
+            sharpBufferSmall.resize(
+              Math.trunc(MAX_DIMENSION_SMALL * ratio),
+              MAX_DIMENSION_SMALL
+            );
+          }
+        }
+
+        const streamSmall = await sharpBufferSmall // we stored image in memory
+          .toFormat("jpeg") // convert all images to jpeg
+          .rotate()
+          .toBuffer();
+
+        cloudinary.v2.uploader
+          .upload_stream(
+            {
+              resource_type: "image",
+              public_id: req.file.filename + "-small",
+              folder: "travelmap",
+              sign_url: true,
+              type: "authenticated",
+            },
+            function (error, result) {
+              if (error) {
+                return next(new AppError("Upload image error", 500));
+              }
+
+              req.body.smallPhotoUrl = result.secure_url;
+              next();
+            }
+          )
+          .end(streamSmall);
+
+        //////////////////////////////////////////////////
       }
     )
     .end(stream);
@@ -238,15 +343,21 @@ exports.getUserPlaces = catchAsync(async function (req, res, next) {
 });
 
 exports.createPlace = catchAsync(async function (req, res, next) {
-  if (process.env.NODE_ENV === "development") {
-    // console.log(newPlace);
-    // console.log("Current User:", req.currentUser);
-  }
-
-  const { name, latitude, longitude, photoUrl, description } = req.body;
+  const { name, latitude, longitude, photoUrl, smallPhotoUrl, description } =
+    req.body;
   const photoCloudName = req.file.filename;
 
   // const countryCode = await getCountryCode(latitude, longitude);
+
+  console.log({
+    name,
+    latitude,
+    longitude,
+    photoUrl,
+    smallPhotoUrl,
+    description,
+    photoCloudName,
+  });
 
   const countryFlag = process.env.FLAG_URL.replace(
     "countryCode",
@@ -270,6 +381,7 @@ exports.createPlace = catchAsync(async function (req, res, next) {
       "country.code": req.countryCode,
       photoCloudName,
       photoUrl,
+      smallPhotoUrl,
       description,
       user: req.currentUser._id,
     });
@@ -294,8 +406,6 @@ exports.createPlace = catchAsync(async function (req, res, next) {
   } catch (err) {
     console.log("Deleting image ...");
     deleteImage(photoCloudName);
-    // console.log(err.message);
-    // return next(new AppError("XXXX", 400));
     throw err;
   }
 });
@@ -492,17 +602,12 @@ exports.getTopPlaces = catchAsync(async function (req, res, next) {
     { $addFields: { num_likes: { $size: { $ifNull: ["$likes", []] } } } },
     { $sort: { num_likes: -1 } },
   ]);
-  // let topPlaces = await Place.aggregate([
-  //   { $addFields: { num_likes: { $size: "$likes" } } },
-  //   { $sort: { num_likes: -1 } },
-  // ]);
 
   topPlaces = await Place.populate(topPlaces, { path: "comments" });
 
   topPlaces = await Place.populate(topPlaces, { path: "user" });
 
   const topThreePlaces = topPlaces
-    // .filter((place) => (username ? place.user.username === username : true))
     .filter((place) => place.num_likes > 0)
     .slice(0, 3);
 
@@ -535,17 +640,12 @@ exports.reloadData = catchAsync(async function (req, res, next) {
     { $addFields: { num_likes: { $size: { $ifNull: ["$likes", []] } } } },
     { $sort: { num_likes: -1 } },
   ]);
-  // let topPlaces = await Place.aggregate([
-  //   { $addFields: { num_likes: { $size: "$likes" } } },
-  //   { $sort: { num_likes: -1 } },
-  // ]);
 
   topPlaces = await Place.populate(topPlaces, { path: "comments" });
 
   topPlaces = await Place.populate(topPlaces, { path: "user" });
 
   const topThreePlaces = topPlaces
-    // .filter((place) => (username ? place.user.username === username : true))
     .filter((place) => place.num_likes > 0)
     .slice(0, 3);
 
@@ -554,7 +654,6 @@ exports.reloadData = catchAsync(async function (req, res, next) {
     .populate("comments")
     .sort({ createdAt: -1 })
     .limit(3);
-  // .populate("comments");
 
   // GET WALLPOSTS
   const wallPosts = await WallPost.find();
@@ -565,6 +664,158 @@ exports.reloadData = catchAsync(async function (req, res, next) {
       topPlaces: topThreePlaces,
       recentPlaces,
       wallPosts,
+    },
+  });
+});
+
+// exports.compress = catchAsync(async function (req, res, next) {
+//   // const name = "Batu Caves";
+
+//   const places = await Place.find();
+
+//   places.forEach(async (placeItem, index) => {
+//     const name = placeItem.name;
+
+//     const place = await Place.findOne({ name });
+
+//     if (!place)
+//       return res.status(200).json({
+//         status: "error",
+//       });
+
+//     const photo = await fetch(place.photoUrl);
+
+//     let photoBuffer = Buffer.from(await photo.arrayBuffer());
+
+//     const filename = place.photoCloudName;
+
+//     const compressedBuffer = await compressImage(photoBuffer, 1024);
+
+//     const sharpBuffer = sharp(compressedBuffer);
+
+//     const metadata = await sharpBuffer.metadata();
+
+//     console.log("metadata", metadata);
+
+//     const ratio = metadata.width / metadata.height;
+
+//     const maxWidth = 2000;
+//     const maxHeight = 2000;
+
+//     if (metadata.width > metadata.height) {
+//       sharpBuffer.resize(maxWidth, Math.trunc(maxWidth / ratio));
+//     } else {
+//       sharpBuffer.resize(Math.trunc(maxHeight * ratio), maxHeight);
+//     }
+
+//     const stream = await sharpBuffer // we stored image in memory
+//       .toFormat("jpeg") // convert all images to jpeg
+//       .rotate()
+//       .toBuffer();
+
+//     cloudinary.v2.uploader
+//       .upload_stream(
+//         {
+//           resource_type: "image",
+//           public_id: filename,
+//           folder: "travelmap",
+//           sign_url: true,
+//           type: "authenticated",
+//         },
+//         async function (error, result) {
+//           if (error) {
+//             return next(new AppError("Upload image error", 500));
+//           }
+//           await Place.findOneAndUpdate(
+//             { name },
+//             { photoUrl: result.secure_url }
+//           );
+//         }
+//       )
+//       .end(stream);
+
+//     console.log(index + 1, "/", places.length);
+//   });
+
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       places: places.length,
+//     },
+//   });
+// });
+
+exports.compress = catchAsync(async function (req, res, next) {
+  // const name = "Batu Caves";
+
+  const places = await Place.find();
+
+  places.forEach(async (placeItem, index) => {
+    const name = placeItem.name;
+
+    const place = await Place.findOne({ name });
+
+    if (!place)
+      return res.status(200).json({
+        status: "error",
+      });
+
+    const photo = await fetch(place.photoUrl);
+
+    let photoBuffer = Buffer.from(await photo.arrayBuffer());
+
+    const filename = place.photoCloudName + "-small";
+
+    // const compressedBuffer = await compressImage(photoBuffer, 1024);
+
+    const sharpBuffer = sharp(photoBuffer);
+
+    const metadata = await sharpBuffer.metadata();
+
+    const ratio = metadata.width / metadata.height;
+
+    const maxWidth = 200;
+    const maxHeight = 200;
+
+    if (metadata.width > metadata.height) {
+      sharpBuffer.resize(maxWidth, Math.trunc(maxWidth / ratio));
+    } else {
+      sharpBuffer.resize(Math.trunc(maxHeight * ratio), maxHeight);
+    }
+
+    const stream = await sharpBuffer // we stored image in memory
+      .toFormat("jpeg") // convert all images to jpeg
+      .rotate()
+      .toBuffer();
+
+    cloudinary.v2.uploader
+      .upload_stream(
+        {
+          resource_type: "image",
+          public_id: filename,
+          folder: "travelmap",
+          sign_url: true,
+          type: "authenticated",
+        },
+        async function (error, result) {
+          if (error) {
+            return next(new AppError("Upload image error", 500));
+          }
+          await Place.findOneAndUpdate(
+            { name },
+            { smallPhotoUrl: result.secure_url }
+          );
+        }
+      )
+      .end(stream);
+
+    console.log(index + 1, "/", places.length);
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      places: places.length,
     },
   });
 });

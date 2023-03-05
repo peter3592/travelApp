@@ -27,6 +27,8 @@ export default function WallPostNewPlace({
     );
 
     setLoading(false);
+    // setTimeout(() => {
+    // }, 1000);
   };
 
   return (
@@ -55,6 +57,16 @@ const Div = styled.div`
   justify-content: flex-start;
   align-items: center;
   gap: 2rem;
+
+  /* .link {
+    display: inline;
+  } */
+
+  .country {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
   .icon {
     font-size: 2.4rem;
@@ -95,6 +107,7 @@ const Div = styled.div`
     }
 
     img {
+      transition: 0.4s all;
       width: 100%;
       cursor: pointer;
       ${({ imageCss }) => imageCss};
@@ -112,17 +125,10 @@ const Div = styled.div`
 
   .postContent {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    /* width: 100%; */
+
+    flex-wrap: wrap;
   }
-
-  /* .wallPost__flag {
-    width: 32px;
-    height: 24px;
-
-    img {
-      width: 100%;
-      height: 100%;
-    }
-  } */
 `;

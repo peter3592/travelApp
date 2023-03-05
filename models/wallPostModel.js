@@ -40,7 +40,7 @@ wallPostSchema.pre(/^find/, function (next) {
 
   this.populate({
     path: "place",
-    select: "_id name photoUrl country -user",
+    select: "_id name photoUrl smallPhotoUrl country -user",
   });
 
   next();

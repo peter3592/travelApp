@@ -17,7 +17,7 @@ export default function TopPlaceItem({ place }) {
   const { setModal } = useUIContext();
 
   const name = place.name;
-  const photo = place.photoUrl;
+  const photo = place.smallPhotoUrl;
   const username = place.user.username;
   const likes = place.likes?.length;
 
@@ -74,17 +74,12 @@ export default function TopPlaceItem({ place }) {
           src={photo}
           alt={photo.name}
           ref={imageRef}
-          // onLoad={imageLoadHandler}
           crossorigin="anonymous"
           onClick={placeClickHandler}
         />
       </div>
       <div className="details">
-        <div
-          className="placeName"
-          // onClick={() => setPlace(place)}
-          onClick={placeClickHandler}
-        >
+        <div className="placeName" onClick={placeClickHandler}>
           {name}
         </div>
         <div className="username">

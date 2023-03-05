@@ -15,7 +15,7 @@ const Div = styled.div`
   align-items: center;
   gap: 2rem;
 
-  transition: all 1s;
+  /* transition: all 1s; */
 
   .icon {
     height: 3rem;
@@ -40,9 +40,15 @@ const Div = styled.div`
   }
 
   .postContent {
-    display: flex;
+    /* display: flex;
     justify-content: center;
     align-items: center;
-    flex-grow: 1;
+    flex-grow: 1; */
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    flex-wrap: wrap;
   }
 `;

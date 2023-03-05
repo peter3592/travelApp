@@ -117,6 +117,20 @@ exports.deleteUser = catchAsync(async function (req, res, next) {
       }
     );
 
+    // Delete small image on cloudinary
+    cloudinary.v2.uploader.destroy(
+      `travelmap/${place.photoCloudName}-small`,
+      { type: "authenticated" },
+      function (error, result) {
+        if (error || result.result !== "ok") {
+          // Just print to console error with deleting image from cloud
+          console.log("💥💥 Deleting image from cloud error");
+          if (error) console.log(error);
+          if (result.result !== "ok") console.log(result);
+        }
+      }
+    );
+
     // Delete place related comments
     await Comment.deleteMany({ place: place._id });
   });

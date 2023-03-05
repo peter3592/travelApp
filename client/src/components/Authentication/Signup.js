@@ -21,7 +21,7 @@ export default function Signup({ setAuthState }) {
       await generateImage();
       setInitialLoadFinished(true);
     })();
-  }, [generateImage]);
+  }, []);
 
   const submitHandler = async (e) => {
     e.preventDefault();

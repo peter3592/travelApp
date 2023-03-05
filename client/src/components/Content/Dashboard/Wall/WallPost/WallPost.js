@@ -88,9 +88,9 @@ export default function WallPost({
             </div>
           </div>
         </Link>
-        <p>&nbsp;liked&nbsp;</p>
-        {targetUserNameUpdated}
-        <p>&nbsp;place&nbsp;</p>
+        <span>&nbsp;liked&nbsp;</span>
+        <span>{targetUserNameUpdated}</span>
+        <span>&nbsp;place&nbsp;</span>
         <span
           className="strong"
           data-placeid={place._id}
@@ -112,14 +112,11 @@ export default function WallPost({
             </div>
           </div>
         </Link>{" "}
-        {/* {type === "like" ? "liked" : "wrote comment on "} */}
-        {/* <p>&nbsp;wrote comment on&nbsp;</p> */}
-        <span>&nbsp;</span>
-        <span>wrote&nbsp;</span>
-        <span>comment&nbsp;</span>
-        <span>on&nbsp;</span>
-        {targetUserNameUpdated}
-        <p>&nbsp;place&nbsp;</p>
+        <span>&nbsp;wrote&nbsp;</span>
+        <span>comment</span>
+        <span>&nbsp;on&nbsp;</span>
+        <span>{targetUserNameUpdated}</span>
+        <span>&nbsp;place&nbsp;</span>
         <span
           className="strong"
           data-placeid={place._id}
@@ -132,9 +129,11 @@ export default function WallPost({
 
   // New place wall post
   if (type === "newPlace") {
+    // console.log("place:", place);
+
     wallPostContent = (
       <WallPostNewPlace
-        placePhoto={place.photoUrl}
+        placePhoto={place.smallPhotoUrl}
         countryFlagUrl={place.country.flagUrl}
         placeId={place._id}
         onPhotoClick={placeClickHandler}
@@ -161,16 +160,15 @@ export default function WallPost({
         ))}
         <span>located&nbsp;</span>
         <span>in&nbsp;</span>
-        <span>place&nbsp;</span>
-        <span>{place.country.name}</span>
-        <span>&nbsp;&nbsp;</span>
-        {/* <span className="wallPost__flag"> */}
-        <img
-          src={place.country.flagUrl.replace("w80", "32x24")}
-          crossorigin="anonymous"
-          // className="wallPost__flag"
-        />
-        {/* </span> */}
+        <span className="country">
+          <span>{place.country.name}&nbsp;&nbsp;</span>
+          {/* <div className="cube"> */}
+          <img
+            src={place.country.flagUrl.replace("w80", "32x24")}
+            crossorigin="anonymous"
+          />
+          {/* </div> */}
+        </span>
       </WallPostNewPlace>
     );
   }
@@ -184,17 +182,23 @@ export default function WallPost({
 }
 
 const Div = styled.div`
-  width: 100%;
-
-  overflow: hidden;
-
   :not(:last-of-type) {
     margin-bottom: 1.2rem;
   }
 
-  .container {
-    width: 100%;
+  line-height: 20px;
 
+  /* .cube {
+    width: 32px;
+    height: 24px;
+    background-color: purple;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  } */
+
+  .container {
     ${({ type }) => {
       if (type === "newPlace")
         return ` 
@@ -214,24 +218,13 @@ const Div = styled.div`
         border-color:  var(--color-pink);
       `;
     }}
-    /* background-color: lightblue;
-    border-left: solid black; */
-    
 
     border-width: 0.6rem;
-    /* border-width: 1.2rem; */
     border-style: solid;
 
     border-top-width: 0;
     border-bottom-width: 0;
     border-right-width: 0;
-
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-
-    padding: 1.2rem 1rem;
-    font-size: 1.5rem;
 
     padding: 1rem 1rem;
     font-size: 1.3rem;
