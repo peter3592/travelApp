@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useDataContext } from "../../../store/context";
 import TopPlaceItem from "./TopPlaceItem";
 
-export default function TopPlaces({ username }) {
+export default function TopPlaces() {
   const { topPlaces } = useDataContext();
 
   return (

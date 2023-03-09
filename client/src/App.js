@@ -44,9 +44,7 @@ function App() {
       const { ok, data } = await fetchAPI("api/v1/users/refresh");
 
       if (ok && data?.user) {
-        // setCurrentUser(data?.user);
         setCurrentUser(data.user);
-
         await reloadData();
       }
 

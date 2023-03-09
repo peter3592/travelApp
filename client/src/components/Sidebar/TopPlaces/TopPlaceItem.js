@@ -55,12 +55,7 @@ export default function TopPlaceItem({ place }) {
 
       setTimeout(() => setLoading(false), [50]);
     }
-  }, [
-    imageRef.current?.width,
-    imageRef.current?.height,
-    // imageContainerWidth,
-    // imageContainerHeight,
-  ]);
+  }, [imageRef.current?.width, imageRef.current?.height]);
 
   return (
     <Div

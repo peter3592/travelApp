@@ -73,8 +73,6 @@ exports.updateUser = catchAsync(async function (req, res, next) {
 });
 
 exports.deleteUser = catchAsync(async function (req, res, next) {
-  //const deletedUser = await User.deleteOne({ id: req.user._id });
-  // const deletedUser = await User.findOneAndDelete({ _id: req.user._id });
   if (req.currentUser.role !== "admin" && !req.body.password) {
     return next(new AppError("Please, provide a password", 400));
   }
@@ -135,12 +133,23 @@ exports.deleteUser = catchAsync(async function (req, res, next) {
     await Comment.deleteMany({ place: place._id });
   });
 
-  // Delete all places and countries of deleted user
+  // Delete all places of deleted user
   await Place.deleteMany({ user: deletedUser.id });
 
+  // Delete all wallposts related to deleted user
   await WallPost.deleteMany({
     $or: [{ sourceUser: deletedUser.id }, { targetUser: deletedUser.id }],
   });
+
+  // Delete deleted users's likes
+  await Place.updateMany(
+    { likes: deletedUser.id },
+    {
+      $pull: {
+        likes: deletedUser.id,
+      },
+    }
+  );
 
   res.clearCookie("jwt");
 

@@ -5,7 +5,11 @@ import { TbWorldLatitude, TbWorldLongitude } from "react-icons/tb";
 import Button from "../../../UI/Button";
 import { BsCheckLg } from "react-icons/bs";
 import { AiOutlineFileImage } from "react-icons/ai";
-import { useDataContext, useUIContext } from "../../../../store/context";
+import {
+  useAuthContext,
+  useDataContext,
+  useUIContext,
+} from "../../../../store/context";
 import LoadingSpinner from "../../../UI/LoadingSpinner";
 // import loadImage from "blueimp-load-image";
 
@@ -26,9 +30,12 @@ export default function NewPlaceForm({
 
   const { setModal } = useUIContext();
   const { reloadData } = useDataContext();
+  const { currentUser } = useAuthContext();
 
   const backdropClickHandler = (e) => {
     if (!e.target.classList.contains("backdrop")) return;
+
+    if (creatingPlace) return;
 
     hideForm();
   };
@@ -60,7 +67,10 @@ export default function NewPlaceForm({
 
     if (!ok) return setModal({ type: "error", message });
 
-    if (places.length === 0) {
+    if (
+      places.length === 0 &&
+      window.location.pathname === `/${currentUser.username}`
+    ) {
       setModal({ type: "info", message: "Click on flag" });
     } else {
       setModal({ type: "success", message: "Place created" });
@@ -103,7 +113,7 @@ export default function NewPlaceForm({
   };
 
   return (
-    <Div className="backdrop" onClick={backdropClickHandler}>
+    <Div className="backdrop" onMouseDown={backdropClickHandler}>
       <form className="form form__newPlace hidden" onSubmit={submitHandler}>
         <p className="country__title">{countryName}</p>
         <div className="country">
