@@ -630,6 +630,35 @@ exports.getRecentPlaces = catchAsync(async function (req, res, next) {
   });
 });
 
+exports.getCoordinates = catchAsync(async function (req, res, next) {
+  const positionStackUrl = process.env.POSITIONSTACK_URL.replace(
+    "placeName",
+    req.body.place
+  );
+
+  console.log("positionStackUrl", positionStackUrl);
+
+  const response = await fetch(positionStackUrl);
+
+  const responseData = await response.json();
+
+  console.log("responseData", responseData);
+
+  let coordinates = null;
+
+  if (responseData.data.length === 0)
+    return next(new AppError("Unable to find any place", 400));
+
+  coordinates = [responseData.data[0].latitude, responseData.data[0].longitude];
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      coordinates,
+    },
+  });
+});
+
 exports.reloadData = catchAsync(async function (req, res, next) {
   // GET TOP PLACES
   let topPlaces = await Place.aggregate([

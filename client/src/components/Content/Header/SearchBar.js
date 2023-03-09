@@ -24,11 +24,15 @@ export default function SearchBar() {
   }, [showSearchResults]);
 
   useEffect(() => {
-    (async () => {
-      await searchHandler();
-      if (!searchString) setFirstLoad(true);
-      if (searchString.length === 1) setFirstLoad(false);
-    })();
+    if (searchString.length === 1 && searchString === " ") {
+      setSearchString("");
+    } else {
+      (async () => {
+        await searchHandler();
+        if (!searchString) setFirstLoad(true);
+        if (searchString.length === 1) setFirstLoad(false);
+      })();
+    }
   }, [searchString]);
 
   const loadAllResults = async () => {
@@ -73,7 +77,8 @@ export default function SearchBar() {
       <input
         type="text"
         placeholder="Search user or place"
-        onChange={(e) => setSearchString(e.target.value.trim())}
+        // onChange={(e) => setSearchString(e.target.value.trim())}
+        onChange={(e) => setSearchString(e.target.value)}
         onFocus={loadAllResults}
         value={searchString}
         data-element="SearchBar"

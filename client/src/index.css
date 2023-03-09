@@ -18,6 +18,8 @@
   --color-grid-row: #f9f9f9;
   --color-grid-row-hover: #f1efef;
 
+  --color-findPlace: #efefef;
+
   --color-heart: #ed1f79;
 
   --color-blue: #0400b7;
@@ -32,12 +34,8 @@
 
   --color-green: #00b749;
   /* --color-green: #35b812; */
-  --color-light-green: #00b74928;
   --color-light-green: #00b74920;
 
-  --color-comment: #f5f5f5;
-  --color-comment: #efefff;
-  --color-comment: #dfdeff;
   --color-comment: #a9dbf1;
 }
 

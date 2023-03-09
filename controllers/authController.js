@@ -23,7 +23,7 @@ const createSendToken = (user, statusCode, req, res) => {
 
   if (req.secure) cookieOptions.secure = true;
 
-  res.cookie("jwt", token, cookieOptions);
+  res.cookie("jwtTravelMap", token, cookieOptions);
 
   // Remove password from output when creating user
   user.password = undefined;
@@ -40,7 +40,7 @@ const createSendToken = (user, statusCode, req, res) => {
 // Protecting the protected routes
 module.exports.onlyLoggedUser = catchAsync(async (req, res, next) => {
   // 1) Getting token from cookies
-  const token = req.cookies?.jwt;
+  const token = req.cookies?.jwtTravelMap;
 
   if (!token)
     return next(
@@ -126,7 +126,7 @@ module.exports.login = catchAsync(async (req, res, next) => {
 });
 
 module.exports.logout = (req, res, next) => {
-  res.clearCookie("jwt");
+  res.clearCookie("jwtTravelMap");
   res.status(200).json({ status: "success" });
 };
 
@@ -145,7 +145,7 @@ module.exports.signup = catchAsync(async (req, res, next) => {
 });
 
 module.exports.refresh = catchAsync(async (req, res, next) => {
-  const token = req.cookies?.jwt;
+  const token = req.cookies?.jwtTravelMap;
 
   if (!token) return res.status(200).json({ status: "success", user: null });
 
@@ -161,7 +161,7 @@ module.exports.refresh = catchAsync(async (req, res, next) => {
 
     res.status(200).json({ status: "success", data: { user: currentUser } });
   } catch (e) {
-    res.clearCookie("jwt");
+    res.clearCookie("jwtTravelMap");
     res.status(200).json({ status: "success", data: { user: null } });
   }
 });

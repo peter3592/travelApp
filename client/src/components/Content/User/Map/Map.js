@@ -14,6 +14,7 @@ import CountriesList from "./CountriesList";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../../UI/Button";
 import fetchAPI from "../../../../utils/fetchAPI";
+import FindPlace from "./FindPlace";
 
 const defaultCoords = [37, 35];
 const defaultZoomLevel = 4;
@@ -95,6 +96,10 @@ export default function Map() {
   }, [places]);
 
   const mapClickHandler = async (e) => {
+    //
+
+    console.log(+e.latlng.lat, +e.latlng.lng);
+
     setLatitude(+e.latlng.lat);
     setLongitude(+e.latlng.lng);
 
@@ -187,11 +192,7 @@ export default function Map() {
         .on("mouseout", function () {
           this.closePopup();
         });
-
-      // newMarkers.push(marker);
     });
-
-    // setMarkers(newMarkers);
   };
 
   const hideForm = () => {
@@ -232,24 +233,26 @@ export default function Map() {
             setPlaces={setPlaces}
           />
         )}
-        {user && user._id === currentUser._id && (
-          <Button
-            onClick={addPlaceButtonClickHandler}
-            className={`button ${
-              places && places.length === 0 && !newPlaceMod
-                ? "button--highlighted"
-                : ""
-            } `}
-            type="primary"
-          >
-            ADD NEW PLACE
-          </Button>
-        )}
+        <div className="actionsContainer">
+          {user && user._id === currentUser._id && (
+            <Button
+              onClick={addPlaceButtonClickHandler}
+              className={`button ${
+                places && places.length === 0 && !newPlaceMod
+                  ? "button--highlighted"
+                  : ""
+              } `}
+              type="primary"
+            >
+              ADD NEW PLACE
+            </Button>
+          )}
+          <FindPlace map={map} />
+        </div>
         <div className="mapContainer">
-          {places &&
-            places.length > 0 && ( // <CountriesList map={map} places={places} />
-              <CountriesList map={map} places={places} />
-            )}
+          {places && places.length > 0 && (
+            <CountriesList map={map} places={places} />
+          )}
           <div id="map" />
         </div>
       </Div>
@@ -267,6 +270,15 @@ const Div = styled.div`
 
   position: relative;
 
+  .actionsContainer {
+    position: absolute;
+    top: 3rem;
+    left: 6rem;
+
+    /* background-color: red; */
+    z-index: 500;
+  }
+
   .mapContainer {
     width: 100%;
     height: 100%;
@@ -278,9 +290,11 @@ const Div = styled.div`
   }
 
   .button {
-    position: absolute;
+    /* position: absolute;
     top: 3rem;
-    left: 6rem;
+    left: 6rem; */
+
+    margin-bottom: 1em;
 
     &--highlighted {
       animation: animationBtn 1s infinite;
@@ -297,6 +311,10 @@ const Div = styled.div`
       }
     }
   }
+
+  /* .findPlace {
+
+  } */
 
   #map {
     width: 100%;

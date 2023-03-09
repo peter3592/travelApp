@@ -1,48 +1,35 @@
 import styled from "styled-components";
 import { HiOutlineRefresh } from "react-icons/hi";
 
-export default function LoadingSpinner2() {
+export default function LoadingSpinner2({ type }) {
   return (
-    <Div>
+    <Div type={type}>
       <HiOutlineRefresh className="icon" />
     </Div>
   );
 }
 
 const Div = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  /* display: flex;
-  gap: 2rem; */
+  ${({ type }) => {
+    if (type === "small") return "";
+
+    return `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+    `;
+  }}
 
   .icon {
     animation: rotate 1s infinite linear;
-    font-size: 3rem;
     color: var(--color-primary);
+    font-size: ${({ type }) => (type === "small" ? "1.8rem" : "3rem;")};
   }
-
-  /* .dot {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 10rem;
-    transform: scale(0);
-
-    &--1 {
-      animation: loadingDot 0.7s infinite 0s ease-out;
-      background-color: var(--color-blue);
-    }
-    &--2 {
-      animation: loadingDot 0.7s infinite 0.15s ease-out;
-      background-color: var(--color-green);
-    }
-    &--3 {
-      animation: loadingDot 0.7s infinite 0.3s ease-out;
-      background-color: var(--color-pink);
-    }
-  } */
 
   @keyframes rotate {
     from {

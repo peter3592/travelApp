@@ -111,7 +111,8 @@ const Div = styled.div`
 
   span {
     font-weight: bold;
-    font-size: 1.6rem;
+    /* font-size: 1.6rem; */
+    /* font-size: 1.5rem; */
     color: var(--color-primary);
   }
 `;

@@ -242,7 +242,6 @@ const Div = styled.div`
       border: none;
       outline: none;
       font-size: 1.3rem;
-      color: var(--color-gray);
       color: var(--color-primary);
 
       :not(:last-of-type) {

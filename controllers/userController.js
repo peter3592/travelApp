@@ -151,7 +151,7 @@ exports.deleteUser = catchAsync(async function (req, res, next) {
     }
   );
 
-  res.clearCookie("jwt");
+  res.clearCookie("jwtTravelMap");
 
   res.status(204).json({
     status: "success",

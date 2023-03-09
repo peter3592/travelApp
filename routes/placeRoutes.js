@@ -41,6 +41,10 @@ router
   .get(authController.onlyLoggedUser, placeController.compress);
 
 router
+  .route("/get-coordinates")
+  .post(authController.onlyLoggedUser, placeController.getCoordinates);
+
+router
   .route("/:id/like")
   .patch(authController.onlyLoggedUser, placeController.likePlace);
 
