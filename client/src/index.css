@@ -1,0 +1,86 @@
+:root {
+  --color-primary: #0400b7;
+  --color-secondary: #00b749;
+  --color-secondary-light: #00b7493f;
+  --color-lightgray: #c6c6c6;
+  --color-gray: #999999;
+  --color-darkgray: #5f5f5f;
+
+  --color-red: crimson;
+
+  --header-height: 8rem;
+  --sidebar-width: 30rem;
+
+  --border-radius: 3rem;
+
+  --color-grid-row: #f9f9f9;
+  --color-grid-row-hover: #f1efef;
+
+  --color-findPlace: #efefef;
+
+  --color-heart: #ed1f79;
+
+  --color-blue: #0400b7;
+  --color-light-blue: #0300b720;
+
+  --color-blue-info: #39ace3;
+  --color-blue-info: #15a3e5;
+
+  --color-pink: #fa00ff;
+  --color-light-pink: #fb00ff20;
+
+  --color-green: #00b749;
+  /* --color-green: #35b812; */
+  --color-light-green: #00b74920;
+
+  --color-comment: #a9dbf1;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%;
+  height: 100%;
+  font-family: "Lato", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 12px; /* width of the entire scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(207, 207, 207); /* color of the tracking area */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(158, 158, 158); /* color of the scroll thumb */
+  border-radius: 20px; /* roundness of the scroll thumb */
+  border: 3px solid rgb(207, 207, 207); /* creates padding around scroll thumb */
+}
+
+/* Leaflet Popup styles */
+.popup .leaflet-popup-tip,
+.popup .leaflet-popup-content-wrapper {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+
+  color: white;
+  border: 3px solid #028837;
+  background: var(--color-secondary);
+}
+
+.leaflet-popup-pane {
+  transform: translateX(4.5px) translateY(20px);
+}

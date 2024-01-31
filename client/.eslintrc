@@ -1,0 +1,6 @@
+{
+  "extends": ["eslint:recommended", "eslint-config-react-app"],
+  "rules": {
+    "jsx-a11y/img-redundant-alt": "off"
+  }
+}
